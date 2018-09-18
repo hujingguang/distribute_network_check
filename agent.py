@@ -53,30 +53,14 @@ for region in REGION_CONF:
 此处添加需要检查的API地址
 '''
 API_TARGET={
-	"crm_monitor_http_key":"https://crm.imlaidian.com/crm-api/crmMonitor",
-	"crm_ad_monitor_http_key":"https://cnt.imlaidian.com/adcrm/adMonitor",
-	"crm_api-http":"https://crm.imlaidian.com/crm-api/crmMonitor",
-	"device_is_available_check":"https://mobile-api.imlaidian.com/cdt/deviceArgs?terminal=000020001650",
-	"wx.imlaidian.com-local":"https://wx.imlaidian.com/share/js/switch.js",
-	"wx.imlaidian.com-wx":"https://wx.imlaidian.com/weixin/css/weixin.css",
-	"www.imlaidian.com":"https://www.imlaidian.com/css/all.min.css",
-	"online_ad_monitor":"https://ad.imlaidian.com/ad-job-api/monitor",
-	"bg_web":"https://bg.imlaidian.com",
-	"ali_web":"https://ali.imlaidian.com/share",
+	"crm_monitor_http_key":"https://crm.imdian.com/api",
 	}
 
 '''
 此处添加需要检查的Ping地址
 '''
-PING_TARGET={'lb-002':['106.75.48.173','lb-002.laidiantech.com','lb-002.imlaidian.com'],
-	'lb-001':['106.75.114.82','lb-001.laidiantech.com','lb-001.imlaidian.com'],
-	'wx-010':['wx-cdt-bj-010.imlaidian.com',],
-	'wx-007':['wx-cdt-bj-007.imlaidian.com',],
-	'mobile-api':['mobile-api.imlaidian.com'],
-	'www.imlaidian.com':['www.imlaidian.com'],
-	'wx.imlaidian.com':['wx.imlaidian.com'],
-	'crm-api':['crm.imlaidian.com'],
-	'terminal-api2':['terminal-api2.imlaidian.com'],
+PING_TARGET={
+       'lb-002':['16.75.48.173','lb.laitech.com','lb.imdian.com'],
 	}
 
 
