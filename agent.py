@@ -363,7 +363,13 @@ class Worker(object):
 		time.sleep(3)
 	    callbacks=self._callbacks
 	    threads=[]
-	    queue=self.manager.get_result_queue()
+	    queue=None
+	    try:
+	        queue=self.manager.get_result_queue()
+	    except Exception as e:
+		self.logger.error('Get Queue Timeout,Sleep 5s')
+		time.sleep(5)
+		continue
 	    if callbacks:
 		for callback in  callbacks:
 		    threads.append(threading.Thread(target=callback,args=(queue,self.logger)))
