@@ -170,7 +170,6 @@ def check_port(queue,logger):
 		    logger.error(str(e))
 		    return
 		send_data=None
-	logger.info(str(v))
 
 
 def check_api(queue,logger):
@@ -228,7 +227,7 @@ def check_api(queue,logger):
 
 
 #callbacks 填入编写的监控插件函数名,按照规定的数据格式返回数据
-CALL_BACKS=[check_port]
+CALL_BACKS=[check_port,check_api,check_ping]
 #检测时间间隔
 CHECK_INTERNAL=60
 
