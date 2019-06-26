@@ -3,7 +3,7 @@
 import os
 import sys
 import logging
-import setproctitle
+#import setproctitle
 from logging.handlers import RotatingFileHandler
 from signal import SIGTERM
 import time
@@ -30,9 +30,9 @@ _LOG_INFO={
 _PID_FILE='/var/run/agent.pid'
 _DEBUG=False
 QUEUE_INFO={
-	'queue_ip':'4.17.6.24',
-	'queue_port':4502,
-	'queue_auth':'Ab'
+	'queue_ip':'127.0.0.1',
+	'queue_port':22222,
+	'queue_auth':'AbAbC'
 	}
 r,HOSTNAME=commands.getstatusoutput('hostname')
 REGION_CONF={'hb1':'青岛',
@@ -53,17 +53,21 @@ for region in REGION_CONF:
 此处添加需要检查的API地址
 '''
 API_TARGET={
-	"crm_monitor_http_key":"https://crm.imdian.com/api",
+	#"crm_monitor_http_key":"https://crm.imdian.com/api",
 	}
 
 '''
 此处添加需要检查的Ping地址
 '''
 PING_TARGET={
-       'lb-002':['16.75.48.173','lb.laitech.com','lb.imdian.com'],
+       #'lb-002':['16.75.48.173','lb.laitech.com','lb.imdian.com'],
 	}
 
+PORT_TARGET={
+	'lb-002':['127.0.0.1:80','127.0.0.1:22','127.0.0.1:21'],
+	}
 
+PORT_TIMEOUT=1
 
 '''
 函数返回数据格式 {"hostname":"ld-hn1-1",
@@ -127,6 +131,47 @@ def check_ping(queue,logger):
 		return
 	    send_data=None
 
+def check_port(queue,logger):
+    global PORT_TARGET,PORT_TIMEOUT
+    target=PORT_TARGET
+    def try_connect(ip,port):
+	sk=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+ 	sk.settimeout(PORT_TIMEOUT)
+	try:
+	    sk.connect((ip,port))
+	    sk.close()
+	    return True
+   	except Exception ,e:
+	    return False
+
+    for k,v in target.iteritems():
+	for ip_port in v:
+            send_data=copy.deepcopy(DEFAULT_DATA)
+            send_data['type']='Port'
+	    send_data["datetime"]=datetime.strftime(datetime.now(),"%Y-%m-%d %H:%M:%S")
+	    if len(ip_port.split(':')) != 2:
+		logger.info('Skip the data: %s' %ip_port)
+            else:
+		ip,port=ip_port.split(':')
+		if try_connect(ip,int(port)):
+		    result,info=0,'IP: %s  Port: %s is connected ' %(ip,port)
+		else:
+		    result,info=1,'IP: %s  Port: %s connect refused ' %(ip,port)
+	        send_data['result'],send_data['info'],send_data['target']=result,info,ip+"_"+port
+		try:
+		    send_data=json.dumps(send_data)
+		except Exception as e:
+		    logger.error(str(e))
+		    send_data=None
+		    continue
+		try:
+		    queue.put(send_data)
+		except Exception as e:
+		    logger.error(str(e))
+		    return
+		send_data=None
+	logger.info(str(v))
+
 
 def check_api(queue,logger):
     global API_TARGET
@@ -179,10 +224,13 @@ def check_api(queue,logger):
 	    return
 	send_data=None
 
+
+
+
 #callbacks 填入编写的监控插件函数名,按照规定的数据格式返回数据
-CALL_BACKS=[check_ping,check_api]
+CALL_BACKS=[check_port]
 #检测时间间隔
-CHECK_INTERNAL=50
+CHECK_INTERNAL=60
 
 class Daemon(object):
     def __init__(self):
@@ -245,7 +293,7 @@ class Daemon(object):
 	os.dup2(se.fileno(),sys.stderr.fileno())
 	import atexit
 	atexit.register(self.del_pidfile)
-	setproctitle.setproctitle('agent')
+	#setproctitle.setproctitle('agent')
 	pid=str(os.getpid())
 	self.logger.info(str(pid))
 	if not os.path.exists(os.path.dirname(self._pid_file)):
@@ -338,6 +386,7 @@ class Worker(object):
    	except Exception ,e:
 	    self.logger.error(str(e))
 	    return False
+
     def start_loop(self):
 	while True:
 	    while True:

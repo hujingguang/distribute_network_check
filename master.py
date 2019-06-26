@@ -3,7 +3,7 @@
 import os
 import sys
 import logging
-import setproctitle
+#import setproctitle
 from logging.handlers import RotatingFileHandler
 from signal import SIGTERM
 import time
@@ -35,9 +35,9 @@ _PID_FILE='/var/run/master.pid'
 _DEBUG=False
 _DEAD_LINE=90
 QUEUE_INFO={
-	'queue_ip':'4.10.3.204',
-	'queue_port':4502,
-	'queue_auth':'Ab'
+	'queue_ip':'127.0.0.1',
+	'queue_port':22222,
+	'queue_auth':'AbAbC'
 	}
 REGION_CONF={'hb1':u'青岛',
 	'hb2':u'北京',
@@ -67,9 +67,10 @@ Status={
        }
        }
        }
-      }
+    }
 '''
-STATUS={'api':{},'ping':{}}
+STATUS={'api':{},'ping':{},'port':{}}
+
 CHECK_INTERNAL=10
 
 
@@ -85,6 +86,8 @@ def main(queue,logger):
 	if current_sec - begin_sec > _DEAD_LINE:
 	    logger.info('超过最大处理时间,停止获取数据,开始处理监控数据')
 	    break
+	logger.info(str(current_sec))
+        logger.info(str(begin_sec))
 	try:
 	    recv=queue.get(timeout=6)
 	    logger.info(recv)
@@ -104,7 +107,9 @@ def main(queue,logger):
 	except Exception as e:
 	    logger.info('No data')
 	    break
+    logger.info(str(all_buff))
     dowith_all(all_buff,logger)
+    logger.info('dowith finish')
     #dowith_ping(ping_buff,logger)
     #dowith_api(api_buff,logger)
     #threads=[]
@@ -163,7 +168,7 @@ def dowith_all(data_dict,logger):
 		    break
 		try:
 	            logger.info(ok_mess)
-	            send_email(ok_mess,"RECOVERY")
+	            #send_email(ok_mess,"RECOVERY")
 		    send_result=1
 		except Exception as e:
 		    logger.info(str(e))
@@ -176,7 +181,7 @@ def dowith_all(data_dict,logger):
 		    break
 		try:
 	            logger.info(alert_mess)
-	            send_email(alert_mess,"PROBLEM")
+	            #send_email(alert_mess,"PROBLEM")
 		    send_result=1
 		except Exception as e:
 		    logger.info(str(e))
@@ -229,10 +234,10 @@ def dowith_ping(data,logger):
 	ok_mess=ok_mess+ok_info
     if send_ok_flag != 0:
 	logger.info(ok_mess)
-	send_email(ok_mess)
+	#send_email(ok_mess)
     if send_alert_flag != 0:
 	logger.info(alert_mess)
-	send_email(alert_mess)
+	#send_email(alert_mess)
 
 
 def dowith_api(data,logger):
@@ -277,10 +282,10 @@ def dowith_api(data,logger):
 	ok_mess=ok_mess+ok_info
     if send_ok_flag != 0:
 	logger.info(ok_mess)
-	send_email(ok_mess,'恢复')
+	#send_email(ok_mess,'恢复')
     if send_alert_flag != 0:
 	logger.info(alert_mess)
-	send_email(alert_mess,'告警')
+	#send_email(alert_mess,'告警')
 
 
 
@@ -367,7 +372,7 @@ class Daemon(object):
 	os.dup2(se.fileno(),sys.stderr.fileno())
 	import atexit
 	atexit.register(self.del_pidfile)
-	setproctitle.setproctitle('master')
+	#setproctitle.setproctitle('master')
 	pid=str(os.getpid())
 	self.logger.info(str(pid))
 	if not os.path.exists(os.path.dirname(self._pid_file)):

@@ -10,7 +10,7 @@ import time
 from multiprocessing.managers import BaseManager
 from logging.handlers import RotatingFileHandler
 from signal import SIGTERM
-import setproctitle
+#import setproctitle
 import sys
 import threading
 from datetime import datetime
@@ -30,7 +30,7 @@ LOG_INFO={
 	}
 QUEUE_INFO={
 	'queue_ip':'0.0.0.0',
-	'queue_port':4502,
+	'queue_port':22222,
 	'queue_auth':'AbAbC'
 	}
 PID_FILE='/tmp/publisher/manager.pid'
@@ -94,7 +94,7 @@ class Daemonize(object):
 	os.umask(022)
 	#import atexit
 	#atexit.register(self.del_pid)
-	setproctitle.setproctitle('queue')
+	#setproctitle.setproctitle('queue')
 	pid=str(os.getpid())
 	if not os.path.exists(os.path.dirname(self.pid_file)):
 	    os.makedirs(os.path.dirname(self.pid_file))
@@ -160,7 +160,7 @@ class Publisher(object):
         self.logger=logging.getLogger('Queue')
 
     def init_publisher(self):
-	setproctitle.setproctitle('queue')
+	#setproctitle.setproctitle('queue')
 	ip=QUEUE_INFO.get('queue_ip','0.0.0.0')
 	port=QUEUE_INFO.get('queue_port',5000)
 	auth=QUEUE_INFO.get('queue_auth',None)
