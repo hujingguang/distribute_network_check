@@ -157,7 +157,7 @@ def check_port(queue,logger):
 		    result,info=0,'IP: %s  Port: %s is connected ' %(ip,port)
 		else:
 		    result,info=1,'IP: %s  Port: %s connect refused ' %(ip,port)
-	        send_data['result'],send_data['info'],send_data['target']=result,info,ip+"_"+port
+		send_data['result'],send_data['info'],send_data['target'],send_data['standby']=result,info,ip+"_"+port,k
 		try:
 		    send_data=json.dumps(send_data)
 		except Exception as e:
